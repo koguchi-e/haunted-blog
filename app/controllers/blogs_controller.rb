@@ -4,6 +4,7 @@ class BlogsController < ApplicationController
   skip_before_action :authenticate_user!, only: %i[index show]
   before_action :set_blog, only: %i[show edit update destroy]
   before_action :is_matching_login_user, only: %i[edit update destroy]
+  before_action :is_secret_blog, only: [:show]
 
   def index
     @blogs = Blog.search(params[:term]).published.default_order
@@ -52,7 +53,13 @@ class BlogsController < ApplicationController
   end
 
   def is_matching_login_user
-    unless @blog.user.id == current_user.id
+    return if @blog.user == current_user
+    redirect_to blogs_path, alert: "編集権限がありません"
+  end
+
+  def is_secret_blog
+    if @blog.secret?
+      return if @blog.user == current_user
       redirect_to blogs_path, alert: "権限がありません"
     end
   end
