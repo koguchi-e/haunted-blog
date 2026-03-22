@@ -2,8 +2,8 @@
 
 class BlogsController < ApplicationController
   skip_before_action :authenticate_user!, only: %i[index show]
-
   before_action :set_blog, only: %i[show edit update destroy]
+  before_action :is_matching_login_user, only: %i[edit update destroy]
 
   def index
     @blogs = Blog.search(params[:term]).published.default_order
@@ -49,5 +49,11 @@ class BlogsController < ApplicationController
 
   def blog_params
     params.expect(blog: %i[title content secret random_eyecatch])
+  end
+
+  def is_matching_login_user
+    unless @blog.user.id == current_user.id
+      redirect_to blogs_path, alert: "権限がありません"
+    end
   end
 end
