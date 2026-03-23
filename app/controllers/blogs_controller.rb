@@ -49,7 +49,11 @@ class BlogsController < ApplicationController
   end
 
   def blog_params
-    params.expect(blog: %i[title content secret random_eyecatch])
+    if current_user.premium?
+      params.expect(blog: %i[title content secret random_eyecatch])
+    else
+      params.expect(blog: %i[title content secret])
+    end
   end
 
   def is_matching_login_user
@@ -61,6 +65,12 @@ class BlogsController < ApplicationController
     if @blog.secret?
       return if @blog.user == current_user
       redirect_to blogs_path, alert: "権限がありません"
+    end
+  end
+
+  def is_premium_user
+    if current_user.premium === false && random_eyecatch === 1
+      render
     end
   end
 end
