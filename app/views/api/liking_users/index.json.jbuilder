@@ -1,4 +1,4 @@
-json.users do
-  json.array! @users, partial: "api/liking_users/user", as: :user
+json.users @users do |user|
+  json.nickname user.nickname
 end
 json.destroy_path @destroy_path
