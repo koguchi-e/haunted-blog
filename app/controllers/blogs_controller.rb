@@ -58,13 +58,13 @@ class BlogsController < ApplicationController
 
   def is_matching_login_user
     return if @blog.user == current_user
-    redirect_to blogs_path, alert: "編集権限がありません"
+    render file: Rails.root.join('public/404.html'),status: 404
   end
 
   def is_secret_blog
     if @blog.secret?
       return if @blog.user == current_user
-      redirect_to blogs_path, alert: "権限がありません"
+      render file: Rails.root.join('public/404.html'),status: 404
     end
   end
 
