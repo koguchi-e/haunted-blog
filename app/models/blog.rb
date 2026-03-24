@@ -9,7 +9,7 @@ class Blog < ApplicationRecord
 
   scope :published, -> { where('secret = FALSE') }
 
-  scope :search,  lambda { |term|
+  scope :search, lambda { |term|
     return all if term.blank?
 
     sanitized = ActiveRecord::Base.sanitize_sql_like(term)
