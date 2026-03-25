@@ -68,8 +68,4 @@ class BlogsController < ApplicationController
 
     render file: Rails.root.join('public/404.html'), status: :not_found
   end
-
-  def premium_user?
-    current_user.premium == false && random_eyecatch == 1
-  end
 end
