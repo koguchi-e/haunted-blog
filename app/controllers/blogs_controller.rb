@@ -57,15 +57,10 @@ class BlogsController < ApplicationController
   end
 
   def matching_login_user?
-    return if @blog.user == current_user
-
-    render file: Rails.root.join('public/404.html'), status: :not_found
+    raise ActiveRecord::RecordNotFound if @blog.user != current_user
   end
 
   def secret_blog?
-    return unless @blog.secret?
-    return if @blog.user == current_user
-
-    render file: Rails.root.join('public/404.html'), status: :not_found
+    raise ActiveRecord::RecordNotFound if @blog.secret? && @blog.user != current_user
   end
 end
