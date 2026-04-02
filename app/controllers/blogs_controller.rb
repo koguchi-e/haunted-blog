@@ -53,10 +53,11 @@ class BlogsController < ApplicationController
   end
 
   def blog_params
-    base = %i[title content secret]
-    premium = current_user.premium? ? [:random_eyecatch] : []
-
-    params.expect(blog: base + premium)
+    if current_user.premium?
+      params.expect(blog: %i[title content secret random_eyecatch])
+    else
+      params.expect(blog: %i[title content secret])
+    end
   end
 
   def set_my_blog
