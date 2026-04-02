@@ -2,16 +2,14 @@
 
 class BlogsController < ApplicationController
   skip_before_action :authenticate_user!, only: %i[index show]
-  before_action :matching_login_user?, only: %i[edit update destroy]
-  before_action :set_blog, only: %i[show edit update destroy]
+  before_action :set_blog, only: %i[show]
+  before_action :set_my_blog, only: %i[edit update destroy]
 
   def index
     @blogs = Blog.search(params[:term]).published.default_order
   end
 
-  def show
-    secret_blog?
-  end
+  def show; end
 
   def new
     @blog = Blog.new
@@ -46,7 +44,12 @@ class BlogsController < ApplicationController
   private
 
   def set_blog
-    @blog = Blog.find(params[:id])
+    @blog =
+      if current_user
+        Blog.where('secret = ? OR user_id =?', false, current_user.id)
+      else
+        Blog.where(secret: false)
+      end.find(params[:id])
   end
 
   def blog_params
@@ -56,11 +59,7 @@ class BlogsController < ApplicationController
     params.expect(blog: base + premium)
   end
 
-  def matching_login_user?
-    raise ActiveRecord::RecordNotFound if @blog.user != current_user
-  end
-
-  def secret_blog?
-    raise ActiveRecord::RecordNotFound if @blog.secret? && @blog.user != current_user
+  def set_my_blog
+    @blog = current_user.blogs.find(params[:id])
   end
 end
