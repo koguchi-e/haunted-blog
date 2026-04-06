@@ -9,7 +9,12 @@ class BlogsController < ApplicationController
   end
 
   def show
-    set_blog
+    @blog =
+      if current_user
+        Blog.published.or(Blog.where(user_id: current_user.id)).find(params[:id])
+      else
+        Blog.published.find(params[:id])
+      end
   end
 
   def new
@@ -43,15 +48,6 @@ class BlogsController < ApplicationController
   end
 
   private
-
-  def set_blog
-    @blog =
-      if current_user
-        Blog.where(secret: false).or(Blog.where(user_id: current_user.id)).find(params[:id])
-      else
-        Blog.find_by!(id: params[:id], secret: false)
-      end
-  end
 
   def blog_params
     permitted = %i[title content secret]
